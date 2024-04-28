@@ -6,7 +6,7 @@ The Royal Library of Belgium would like to have a tool to easily manage their st
 
 The UML class diagram provides an overview of the system's architecture and relationships between different components.
 
-![usage example](https://github.com/taheroo/book-library-tool/blob/master/uml-class-diagram.png)
+![usage example](https://github.com/taheroo/book-library-tool/blob/main/uml-class-diagram.png)
 
 ## Development
 
