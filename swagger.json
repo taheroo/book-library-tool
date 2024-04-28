@@ -1,0 +1,256 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+      "title": "Book Library API",
+      "version": "1.0.0",
+      "description": "API for managing books reservations."
+    },
+    "servers": [
+      {
+        "url": "http://localhost:3000"
+      }
+    ],
+    "paths": {
+      "/api/users": {
+        "post": {
+          "summary": "Create a new user",
+          "description": "This endpoint creates a new user with the data provided in the request body.",
+          "operationId": "createUser",
+          "requestBody": {
+            "description": "User data",
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": {
+              "description": "User created successfully"
+            },
+            "400": {
+              "description": "Invalid data provided"
+            }
+          }
+        },
+        "get": {
+          "summary": "Get all users",
+          "description": "This endpoint retrieves all users.",
+          "operationId": "getUsers",
+          "responses": {
+            "200": {
+              "description": "A list of users",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/User"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/api/users/{id}": {
+        "get": {
+          "summary": "Get user by ID",
+          "description": "This endpoint retrieves a user based on the user ID provided in the path.",
+          "operationId": "getUserById",
+          "parameters": [
+            {
+              "name": "id",
+              "in": "path",
+              "required": true,
+              "description": "The ID of the user to retrieve",
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "User data retrieved successfully",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/User"
+                  }
+                }
+              }
+            },
+            "404": {
+              "description": "User not found"
+            }
+          }
+        }
+      },
+      "/api/reservations": {
+        "post": {
+            "summary": "Create a new reservation",
+            "description": "This endpoint creates a new reservation with the data provided in the request body. Note: 'return_date' should not be included when creating a reservation.",
+            "operationId": "createReservation",
+            "requestBody": {
+              "description": "Reservation data, excluding the return date",
+              "required": true,
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "required": ["user", "book", "reservation_starts_date", "reservation_ends_date"],
+                    "properties": {
+                      "user": {
+                        "type": "string",
+                        "description": "The ID of the user making the reservation"
+                      },
+                      "book": {
+                        "type": "string",
+                        "description": "The ID of the book being reserved"
+                      },
+                      "reservation_starts_date": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "The start date of the reservation"
+                      },
+                      "reservation_ends_date": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "The end date of the reservation"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "responses": {
+              "201": {
+                "description": "Reservation created successfully"
+              },
+              "400": {
+                "description": "Invalid data provided"
+              }
+            }
+          },
+        "get": {
+          "summary": "Get all reservations",
+          "description": "This endpoint retrieves all reservations.",
+          "operationId": "getReservations",
+          "responses": {
+            "200": {
+              "description": "A list of reservations",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/Reservation"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/api/reservations/{id}": {
+        "put": {
+          "summary": "Update a reservation",
+          "description": "This endpoint updates an existing reservation based on the ID provided in the path.",
+          "operationId": "updateReservation",
+          "parameters": [
+            {
+              "name": "id",
+              "in": "path",
+              "required": true,
+              "description": "The ID of the reservation to update",
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "requestBody": {
+            "description": "Updated reservation data",
+            "required": true,
+            "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "required": ["user", "book", "reservation_starts_date", "reservation_ends_date"],
+                    "properties": {
+                      "user": {
+                        "type": "string",
+                        "description": "The ID of the user making the reservation"
+                      },
+                      "book": {
+                        "type": "string",
+                        "description": "The ID of the book being reserved"
+                      }
+                    }
+                  }
+                }
+              }
+          },
+          "responses": {
+            "200": {
+              "description": "Reservation updated successfully"
+            },
+            "404": {
+              "description": "Reservation not found"
+            },
+            "400": {
+              "description": "Invalid data provided"
+            }
+          }
+        }
+      }      
+    },
+    "components": {
+      "schemas": {
+        "User": {
+          "type": "object",
+          "required": ["email"],
+          "properties": {
+            "email": {
+              "type": "string",
+              "description": "The user's email address"
+            }
+          }
+        },
+        "Reservation": {
+            "type": "object",
+            "required": ["user", "book", "reservation_starts_date", "reservation_ends_date"],
+            "properties": {
+              "user": {
+                "type": "string",
+                "description": "The ID of the user making the reservation"
+              },
+              "book": {
+                "type": "string",
+                "description": "The ID of the book being reserved"
+              },
+              "reservation_starts_date": {
+                "type": "string",
+                "format": "date-time",
+                "description": "The start date of the reservation"
+              },
+              "reservation_ends_date": {
+                "type": "string",
+                "format": "date-time",
+                "description": "The end date of the reservation"
+              },
+              "return_date": {
+                "type": "string",
+                "format": "date-time",
+                "description": "The actual return date of the book"
+              }
+            }
+          }          
+      }
+    }
+}
+  
