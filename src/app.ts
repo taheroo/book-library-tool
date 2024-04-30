@@ -5,14 +5,20 @@ import userRoutes from "./routes/user.routes";
 import reservationRoutes from "./routes/reservation.routes";
 import multer from "multer";
 import swaggerUi from "swagger-ui-express";
+import pinoHttp from "pino-http";
 import swaggerDocument from "../swagger.json";
 import connectDB from "./databases";
 import "./services/scheduler";
+import logger from "./services/logger";
 
 dotenv.config();
 
 const app: Express = express();
-
+const pinoHttpOptions = {
+  logger: logger,
+  autoLogging: true,
+};
+const httpLogger = pinoHttp(pinoHttpOptions);
 // Connect to MongoDB
 connectDB();
 
@@ -24,7 +30,9 @@ app.use(
     dest: "uploads/",
   }).single("file")
 );
-
+if (process.env.NODE_ENV === "production") {
+  app.use(httpLogger);
+}
 // Routes
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.get("/", (req, res) => {

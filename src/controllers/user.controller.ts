@@ -1,13 +1,19 @@
 import { Request, Response } from "express";
-import UserModel from "../models/user";
+import * as UserServices from "../services/user.services";
 import { MongoDBError } from "../types/mongodb-error.types";
 import { MONGO_ERROR_CODES } from "../constants/mongodb-error-codes";
+import { createUserSchema } from "../validations/user.validations";
+import logger from "../services/logger";
 
 export const createUser = async (req: Request, res: Response) => {
   try {
-    const newUser = new UserModel(req.body);
-    await newUser.save();
-    res.status(201).send(newUser);
+    const { error } = createUserSchema.safeParse(req.body);
+    if (error) {
+      return res.status(400).send(error.format());
+    }
+    logger.info("Creating user", { body: req.body });
+    const result = await UserServices.createUser(req.body);
+    res.status(201).send(result);
   } catch (error) {
     const e = error as MongoDBError;
     if (e.code === MONGO_ERROR_CODES.DUPLICATE_KEY) {
@@ -22,20 +28,8 @@ export const getUsers = async (req: Request, res: Response) => {
   try {
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 10;
-
-    const offset = (page - 1) * limit;
-    const users = await UserModel.find().skip(offset).limit(limit);
-    const totalCount = await UserModel.countDocuments();
-
-    res.send({
-      users,
-      pagination: {
-        total: totalCount,
-        page: page,
-        limit: limit,
-        totalPages: Math.ceil(totalCount / limit),
-      },
-    });
+    const result = await UserServices.getUsers(page, limit);
+    res.send(result);
   } catch (error) {
     console.log("Error fetching users", error);
     res.status(500).send(error);
@@ -44,11 +38,11 @@ export const getUsers = async (req: Request, res: Response) => {
 
 export const getUserById = async (req: Request, res: Response) => {
   try {
-    const user = await UserModel.findById(req.params.id);
-    if (!user) {
+    const result = await UserServices.getUserById(req.params.id);
+    if (!result) {
       return res.status(404).send("User not found");
     }
-    res.send(user);
+    res.send(result);
   } catch (error) {
     res.status(500).send(error);
   }

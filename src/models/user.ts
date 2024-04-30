@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-interface User {
+export interface User {
   email: string;
   points: number;
 }
