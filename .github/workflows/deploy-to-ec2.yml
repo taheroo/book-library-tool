@@ -13,6 +13,21 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Setup AWS CLI
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Get Public IP of the Runner
+        id: ip
+        run: echo "::set-output name=runner_ip::$(curl http://checkip.amazonaws.com)"
+
+      - name: Update AWS Security Group
+        run: |
+          aws ec2 authorize-security-group-ingress --group-id ${{ secrets.SECURITY_GROUP_ID }} --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.runner_ip }}/32
+
       - name: Setup SSH and Update Known Hosts
         run: |
           set -x
