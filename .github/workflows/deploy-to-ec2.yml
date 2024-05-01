@@ -1,0 +1,28 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.EC2_IP_ADDRESS }} >> ~/.ssh/known_hosts
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Sync changes to EC2
+        run: |
+          rsync -avz -e "ssh -i ~/.ssh/id_rsa" --exclude=node_modules --exclude=.git ./ ${{ secrets.EC2_IP_ADDRESS }}:~/book-library-tool
+          ssh -i ~/.ssh/id_rsa ${{ secrets.EC2_IP_ADDRESS }} "cd ~/book-library-tool && npm install && sudo systemctl restart myapp.service"
