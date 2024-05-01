@@ -7,7 +7,12 @@
     },
     "servers": [
       {
-        "url": "http://localhost:3000"
+        "url": "http://localhost:3000",
+        "description": "Local server"
+      },
+      {
+        "url": "https://api.scanmeet.com",
+        "description": "Production server"
       }
     ],
     "paths": {
