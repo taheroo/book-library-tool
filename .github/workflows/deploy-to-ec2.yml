@@ -44,3 +44,13 @@ jobs:
         run: |
           rsync -avz -e "ssh -i ~/.ssh/id_rsa" --exclude=node_modules --exclude=.git ./ ${{ secrets.EC2_IP_ADDRESS }}:~/book-library-tool
           ssh -i ~/.ssh/id_rsa ${{ secrets.EC2_IP_ADDRESS }} "cd ~/book-library-tool && npm install && sudo systemctl restart myapp.service"
+
+      - name: Clean up IP Whitelist
+        if: always()
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+        run: |
+          aws ec2 revoke-security-group-ingress --group-id ${{ secrets.SECURITY_GROUP_ID }} --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.runner_ip }}/32
