@@ -43,7 +43,7 @@ jobs:
       - name: Sync changes to EC2
         run: |
           rsync -avz -e "ssh -i ~/.ssh/id_rsa" --exclude=node_modules --exclude=.git ./ ${{ secrets.EC2_IP_ADDRESS }}:~/book-library-tool
-          ssh -i ~/.ssh/id_rsa ${{ secrets.EC2_IP_ADDRESS }} "cd ~/book-library-tool && npm install && sudo systemctl restart myapp.service"
+          ssh -i ~/.ssh/id_rsa ${{ secrets.EC2_IP_ADDRESS }} "cd ~/book-library-tool && npm install && npm run build && sudo systemctl restart myapp.service"
 
       - name: Clean up IP Whitelist
         if: always()
