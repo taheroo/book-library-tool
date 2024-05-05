@@ -52,21 +52,11 @@ npm run test
 
 A very simple project structure:
 
-- `src`: This folder is the main container of all the code inside your application.
-  - `model`: Contains data models.
-  - `routes`: Folder to store all the routes in your application.
-  - `controllers`: Contains business logic.
-
-### Improvements (TODO)
-
-- [ ] Add Validation
-- [ ] Add Log
-- [ ] Improve Swagger Documentation
-- [ ] Complete Integration tests
-- [ ] Separate controllers/services
-- [ ] Write Unit Tests
-- [ ] Dockerize the solution
-- [ ] CI/CD pipeline, AWS
+- `src`: The main container for all the application's code.
+  - `model`: Contains data models that define the schema for the database.
+  - `routes`: Stores all the routes (URL paths) that define the endpoints of the application.
+  - `controllers`: Handle requests, process data, and return responses.
+  - `services`: Contains business logic.
 
 ## Contribution
 
