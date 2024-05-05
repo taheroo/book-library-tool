@@ -7,6 +7,10 @@ interface Reservation {
   reservation_starts_date: Date;
   reservation_ends_date: Date;
   return_date?: Date;
+  reminders?: {
+    due_date_reminder_sent?: Date;
+    late_return_reminder_sent?: Date;
+  };
 }
 
 const reservationSchema = new mongoose.Schema<Reservation>({
@@ -15,6 +19,10 @@ const reservationSchema = new mongoose.Schema<Reservation>({
   reservation_starts_date: { type: Date, required: true },
   reservation_ends_date: { type: Date, required: true },
   return_date: { type: Date },
+  reminders: {
+    due_date_reminder_sent: { type: Date },
+    late_return_reminder_sent: { type: Date },
+  },
 });
 
 reservationSchema.pre("save", async function (next) {

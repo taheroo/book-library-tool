@@ -117,7 +117,11 @@ export const uploadBooks = (req: Request, res: Response) => {
     publication_year: Date;
     publisher: string;
   }[] = [];
-
+  /**
+   * csv-parser is a streaming parser
+   * it reads the file line by line, instead of loading the entire file into memory
+   * which can cause memory issues, especially when the file is large
+   */
   fs.createReadStream(filePath)
     .pipe(csvParser())
     .on("data", (data) => results.push(data))

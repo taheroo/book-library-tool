@@ -20,7 +20,7 @@ const bookSchema = new mongoose.Schema<Book>({
   available_copies: { type: Number, required: true, default: 4 },
 });
 
-bookSchema.index({ title: 1 });
+bookSchema.index({ title: "text", author: "text" });
 bookSchema.index({ author: 1 });
 
 const BookModel = mongoose.model<Book>("Book", bookSchema);

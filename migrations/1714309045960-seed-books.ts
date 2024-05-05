@@ -30,7 +30,6 @@ const loadData = (): Promise<BookData[]> =>
 export async function up(): Promise<void> {
   const { Book } = await getModels();
   const books = await loadData();
-  // await Book.insertMany(books);
   // Prepare the operations for bulkWrite
   const operations: AnyBulkWriteOperation<any>[] = books.map((book) => ({
     insertOne: {
@@ -38,10 +37,10 @@ export async function up(): Promise<void> {
     },
   }));
 
-  // Execute the bulk operation
   await Book.bulkWrite(operations, { ordered: false });
 }
 
 export async function down(): Promise<void> {
-  // Write migration here
+  const { Book } = await getModels();
+  await Book.deleteMany({});
 }

@@ -4,15 +4,20 @@ import { MongoDBError } from "../types/mongodb-error.types";
 import { MONGO_ERROR_CODES } from "../constants/mongodb-error-codes";
 import { createUserSchema } from "../validations/user.validations";
 import logger from "../services/logger";
+import UserModel from "../models/user";
 
 export const createUser = async (req: Request, res: Response) => {
   try {
-    const { error } = createUserSchema.safeParse(req.body);
+    const { error, data } = createUserSchema.safeParse(req.body);
     if (error) {
       return res.status(400).send(error.format());
     }
+    const isUserExists = await UserModel.exists({ email: req.body.email });
+    if (isUserExists) {
+      return res.status(409).send("A user with the same email already exists.");
+    }
     logger.info("Creating user", { body: req.body });
-    const result = await UserServices.createUser(req.body);
+    const result = await UserServices.createUser(data);
     res.status(201).send(result);
   } catch (error) {
     const e = error as MongoDBError;
