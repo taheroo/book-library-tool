@@ -12,6 +12,7 @@ const client = new mongo.MongoClient(
 );
 
 export const handler: Handler = async (): Promise<APIGatewayProxyResultV2> => {
+  console.log("Starting reminder service V1.0");
   const db = await client.db("dev-library");
   const reservationCollection = db.collection("reservations");
   const today = new Date();
@@ -64,7 +65,7 @@ export const handler: Handler = async (): Promise<APIGatewayProxyResultV2> => {
         _id: "$user._id",
         user: { $first: "$user" },
         books: { $push: "$book.title" },
-        reservation_ends_date: { $first: "$reservation_ends_date" },
+        reservation: { $first: "$_id" },
       },
     },
   ];
@@ -72,7 +73,7 @@ export const handler: Handler = async (): Promise<APIGatewayProxyResultV2> => {
     .aggregate(aggregationPipeline)
     .toArray();
   console.log(`Found reservations: ${reservations.length}`);
-  for (const { _id, user, books } of reservations) {
+  for (const { reservation, user, books } of reservations) {
     console.log(`Sending email to ${user.email}`);
     await mailer.sendMail({
       to: user.email,
@@ -87,8 +88,9 @@ export const handler: Handler = async (): Promise<APIGatewayProxyResultV2> => {
         user.email
       } ends in two days`
     );
+    console.log(`Updating reservation ${reservation}`);
     await reservationCollection.updateOne(
-      { _id },
+      { _id: reservation },
       { $set: { "reminders.due_date_reminder_sent": new Date() } }
     );
   }
